@@ -9,10 +9,84 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/txttitulo"
+        android:text="@string/country_flag_recognition"
+        android:textSize="21sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="30dp"
+        />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_load_image"
+        android:text="LOAD IMAGE"
+        app:layout_constraintEnd_toStartOf="@id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageview"
+        android:layout_marginTop="18dp"/>
+
+    <ImageView
+        android:layout_width="300dp"
+        android:layout_height="450dp"
+        android:id="@+id/imageview"
+        android:layout_marginTop="45dp"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/txttitulo"
+        app:layout_constraintHorizontal_bias="0.5"
+        android:src=""/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_capture_image"
+        android:text="TAKE IMAGE"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/imageview"
+        android:layout_marginTop="18dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textview"
+        android:text="Output: "
+        android:textSize="21sp"
+        app:layout_constraintTop_toBottomOf="@+id/btn_capture_image"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="38dp"
+        android:layout_marginTop="24dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvoutput"
+        android:text="Result here"
+        android:textSize="21sp"
+        app:layout_constraintTop_toBottomOf="@+id/btn_capture_image"
+        app:layout_constraintStart_toEndOf="@+id/textview"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="24dp"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideline"
+        app:layout_constraintGuide_percent="0.5"
+        android:orientation="vertical"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_get_data"
+        android:text="GET DATA"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvoutput"
+        android:layout_marginTop="18dp"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
