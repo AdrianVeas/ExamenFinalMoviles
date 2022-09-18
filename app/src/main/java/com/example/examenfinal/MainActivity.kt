@@ -1,7 +1,6 @@
 package com.example.examenfinal
 
 import android.app.Activity
-import android.app.Instrumentation
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -19,8 +18,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.example.examenfinal.databinding.ActivityMainBinding
 import com.example.examenfinal.ml.ModelUnquant
+import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.TensorImage
+import org.tensorflow.lite.support.image.TensorImage.fromBitmap
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -28,6 +31,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var button: Button
     private lateinit var tvOutput:TextView
     private val GALLERY_REQUEST_CODE =123
+    var imageSize = 224
+    private var outputFeature0 = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -57,6 +62,18 @@ class MainActivity : AppCompatActivity() {
                 onresult.launch(intent)
             }else{
                 requestPermission.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+        }
+        val buttongetdata = binding.btnGetData
+        buttongetdata.setOnClickListener {
+            if (outputFeature0 != "")
+            {
+                val intent = Intent(this, ResponseActivity::class.java)
+                intent.putExtra("output", outputFeature0)
+                startActivity(intent)
+
+            }else{
+                Toast.makeText(this, "TAKE A PHOTO O LOAD IMAGE FOR YOU GALLERY", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -97,19 +114,34 @@ class MainActivity : AppCompatActivity() {
     }
     private fun outputGenerator(bitmap: Bitmap){
         val model = ModelUnquant.newInstance(this)
-        val newBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
-        val tfimage = TensorImage.fromBitmap(newBitmap)
+        val inputFeature0 =
+            TensorBuffer.createFixedSize(intArrayOf(1, 224, 224, 3), DataType.FLOAT32)
+        val byteBuffer = ByteBuffer.allocateDirect(4 * imageSize * imageSize * 3)
+        byteBuffer.order(ByteOrder.nativeOrder())
 
-        val outputs = model.process(tfimage)
-            .probabilityAsCategoryList.apply {
-                shortByDescending{
-                    it.score
-                }
+
+
+        // get 1D array of 224 * 224 pixels in image
+        val intValues = IntArray(imageSize * imageSize)
+        image.getPixels(intValues, 0, image.width, 0, 0, image.width, image.height)
+
+        // iterate over pixels and extract R, G, and B values. Add to bytebuffer.
+        var pixel = 0
+        for (i in 0 until imageSize) {
+            for (j in 0 until imageSize) {
+                val `val` = intValues[pixel++] // RGB
+                byteBuffer.putFloat((`val` shr 16 and 0xFF) * (1f / 255f))
+                byteBuffer.putFloat((`val` shr 8 and 0xFF) * (1f / 255f))
+                byteBuffer.putFloat((`val` and 0xFF) * (1f / 255f))
             }
+        }
+        inputFeature0.loadBuffer(byteBuffer)
 
-        val outputFeature0 = outputs.outputFeature0AsTensorBuffer
 
-// Releases model resources if no longer used.
+
+
+
+        outputFeature0 = outputs.outputFeature0AsTensorBuffer
         model.close()
     }
 }
